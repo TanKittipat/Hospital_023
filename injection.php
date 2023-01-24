@@ -7,47 +7,36 @@
     <title>023-Kittipat</title>
 </head>
 <body>
-    <?php
-    require "connect.php";
-    if(isset($_GET["P_Name"]))
-    {
-        $strP_Name = $_GET["P_Name"];
-        echo"<br>"."strP_Name = ".$strP_Name;
-    
-        $sql = "SELECT * FROM patient,permissions WHERE P_Name LIKE %'" . $strP_Name ."'%";
-    
-        echo "<br>" . " sql =
-        " .$sql . "<br>";
-    
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        // print_r($result);
-
-    }
-
-    ?>
-    
-    <table width="300" border="1">
-        <tr>
-            <th width="325">ชื่อ</th>
-            <td width="240"><?php echo $result["P_Name"]; ?></td>
-        </tr>
-
-        <tr>
-            <th width="130">ยอดหนี้</th>
-            <td><?php echo $result["P_debt"]; ?></td>
-        </tr>
-
-        <tr>
-            <th width="130">บัญชีผู้ใช้</th>
-            <td><?php echo $result["P_Username"]; ?></td>
-        </tr>
-
-    </table>
-    <?php
-    $conn = null;
-    ?>
-
+    <h1>Search Patient</h1>
+    <form action="injection.php" method="GET">
+    <input type="text" placeholder="Enter Patient Name" name="P_name">
+    <br><br>
+    <input type="submit">
+    </form>
 </body>
 </html>
+
+<?php
+if(isset($_GET['P_name'])):
+    echo"<br>" . $_GET['P_name'];
+    require 'connect.php';
+    $P_name = $_GET['P_name'];
+    $count = 0;
+    $sql = "SELECT * FROM patient,permissions WHERE patient.P_id = permissions.P_CID AND P_name LIKE :P_name";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindValue(':P_name',"%" .$P_name. "%");
+    $stmt->execute();
+    $stmt->setFetchMode(PDO::FETCH_ASSOC);
+
+    echo "<br> *************** <br>";
+
+    while($row = $stmt->fetch()) {
+        echo $row['P_name'].' '.$row['P_debt'].' '.$row['P_Username']."<br/>";
+        $count++;
+    }
+    //echo "count ... "$count;
+    if($count==0)
+        echo"<br>No data ... <br>";
+        $conn = null;
+endif;
+?>
