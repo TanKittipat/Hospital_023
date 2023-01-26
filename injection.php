@@ -17,26 +17,44 @@
 </html>
 
 <?php
-if(isset($_GET['P_name'])):
-    echo"<br>" . $_GET['P_name'];
-    require 'connect.php';
-    $P_name = $_GET['P_name'];
-    $count = 0;
-    $sql = "SELECT * FROM patient,permissions WHERE patient.P_id = permissions.P_CID AND P_name LIKE :P_name";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindValue(':P_name',"%" .$P_name. "%");
-    $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_ASSOC);
+    require "connect.php";
+    if(isset($_GET["P_name"])&&$_GET['P_name']!=null)
+    {
+        $sql = "SELECT * FROM patient,permissions where patient.P_id = permissions.P_CID AND P_name LIKE CONCAT('%', :P_name ,'%')";
+    
+        echo "<br>" . " sql =
+        " .$sql . "<br>";
+    
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':P_name',$_GET['P_name']);
+        $stmt->execute();
+        ?>
 
-    echo "<br> *************** <br>";
+        <table width="500" border="1">
+        <tr>
+            <th>ชื่อ</th>
+            <th>ยอดหนี้</th>
+            <th>บัญชีผู้ใช้</th>
+        </tr>
+        
+        <?php
+        while($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        ?>
+    
 
-    while($row = $stmt->fetch()) {
-        echo $row['P_name'].' '.$row['P_debt'].' '.$row['P_Username']."<br/>";
-        $count++;
-    }
-    //echo "count ... "$count;
-    if($count==0)
-        echo"<br>No data ... <br>";
-        $conn = null;
-endif;
-?>
+        <tr>
+            <td><?php echo $result['P_name']; ?></td>
+            <td><?php echo $result['P_debt']; ?></td>
+            <td><?php echo $result['P_Username']; ?></td>
+        </tr>
+
+    
+
+    
+    <?php }
+    // if($_GET['P_name']==null)
+    // echo "<br> NO Data... <br>";
+    $conn = null;
+        }
+    ?>
+    </table>
