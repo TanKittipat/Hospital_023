@@ -36,6 +36,7 @@
 
         if($stmt->execute()):
             $message = 'Successful add new Patient';
+            header('location:addPermission.php');
         else:
             $message = 'Failed to add new Patient';
         endif;
